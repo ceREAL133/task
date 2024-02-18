@@ -1,14 +1,9 @@
-import {
-  //   BadRequestException,
-  Injectable,
-  Logger,
-  Optional,
-} from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-// import { inspect } from 'util';
 
 import { Message } from '../../schemas/message.schema';
+import { CreateMessageDto } from '../../dto/create-message.dto';
 
 @Injectable()
 export class MessageService {
@@ -21,8 +16,11 @@ export class MessageService {
     return await this.messageModel.find().exec();
   }
 
-  //   async createMessage(): Promise<Message>{
+  async createMessage(dto: CreateMessageDto): Promise<Message> {
+    // TODO: check if userId in workspace and currentUserId matches
+    // TODO: check if such workspace exists
+    // TODO: Date should be current date
 
-  //     return await this.messageModel.create()
-  //   }
+    return await this.messageModel.create(dto);
+  }
 }

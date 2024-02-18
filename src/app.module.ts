@@ -8,6 +8,7 @@ import { AppService } from './app.service';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { MessageModule } from './modules/message/message.module';
+import { WorkspaceModule } from './modules/workspace/workspace.module';
 
 const uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@template.jhtzd0n.mongodb.net/task?retryWrites=true&w=majority`;
 
@@ -18,6 +19,7 @@ const uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWOR
     UserModule,
     AuthModule,
     MessageModule,
+    WorkspaceModule,
   ],
   controllers: [AppController],
   providers: [AppService],

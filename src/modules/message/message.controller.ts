@@ -1,13 +1,9 @@
-import {
-  Controller,
-  Get,
-  UseGuards,
-  // Post, Req, UseGuards
-} from '@nestjs/common';
+import { Controller, Get, UseGuards, Post, Body } from '@nestjs/common';
 
 import { Message } from '../../schemas/message.schema';
 import { MessageService } from './message.service';
 import { AuthGuard } from '../../guards/auth.guard';
+import { CreateMessageDto } from '../../dto/create-message.dto';
 
 @Controller('messages')
 export class MessageController {
@@ -19,9 +15,9 @@ export class MessageController {
     return await this.messageService.getMessages();
   }
 
-  // @UseGuards()
-  // @Post('/')
-  // async createMessage(@Req() req): Promise<Message> {
-  //   return await this.messageService.createMessage(req);
-  // }
+  @UseGuards(AuthGuard)
+  @Post('/createMessage')
+  async createMessage(@Body() dto: CreateMessageDto): Promise<Message> {
+    return await this.messageService.createMessage(dto);
+  }
 }

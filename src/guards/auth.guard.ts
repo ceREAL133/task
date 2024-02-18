@@ -9,9 +9,14 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
+import { UserDocument } from '../schemas/user.schema';
 
 export const IS_PUBLIC_KEY = 'isPublic';
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
+
+export interface RequestWithUser extends Request {
+  user: UserDocument;
+}
 
 @Injectable()
 export class AuthGuard implements CanActivate {

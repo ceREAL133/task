@@ -11,10 +11,7 @@ export class Workspace {
   userId: Types.ObjectId;
 
   @Prop({ required: true })
-  login: string;
-
-  @Prop({ required: true })
-  password: string;
+  name: string;
 }
 
 export const WorkspaceSchema = SchemaFactory.createForClass(Workspace);
