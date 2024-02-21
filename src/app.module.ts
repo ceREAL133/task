@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -9,13 +9,18 @@ import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { MessageModule } from './modules/message/message.module';
 import { WorkspaceModule } from './modules/workspace/workspace.module';
-
-const uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@template.jhtzd0n.mongodb.net/task?retryWrites=true&w=majority`;
+import configuration from './config/configuration';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
-    MongooseModule.forRoot(uri),
+    ConfigModule.forRoot({ load: [configuration] }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get<string>('database.uri'),
+      }),
+      inject: [ConfigService],
+    }),
     UserModule,
     AuthModule,
     MessageModule,
