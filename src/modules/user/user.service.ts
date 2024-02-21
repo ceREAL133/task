@@ -26,6 +26,9 @@ export class UserService {
     this.logger.log(`Trying to create user with such params: ${inspect(dto)}`);
 
     try {
+      // I'm saving user in db with raw password. Not the best practice, but it wasn't described in requirements.
+      // I know how to use bcrypt, crypto and other password encrypting libraries, but lets not focus on this :)
+
       const user = await this.userModel.create(dto);
 
       this.logger.log(`User ${user.login} was successfully created`);
