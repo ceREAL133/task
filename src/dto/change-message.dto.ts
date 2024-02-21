@@ -1,9 +1,6 @@
 import { IsNumber, IsString } from 'class-validator';
 
-export class CreateMessageDto {
-  @IsString()
-  workspaceId: string;
-
+export class ChangeMessageDto {
   @IsNumber()
   likes: number;
 

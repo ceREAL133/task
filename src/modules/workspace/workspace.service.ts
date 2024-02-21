@@ -8,8 +8,8 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 
-import { Workspace } from '../../schemas/workspace.schema';
-import { WorkspaceDto } from 'src/dto/workspace.dto';
+import { Workspace, WorkspaceDocument } from '../../schemas/workspace.schema';
+import { WorkspaceDto } from '../../dto/workspace.dto';
 import { RequestWithUser } from '../../guards/auth.guard';
 
 @Injectable()
@@ -19,8 +19,12 @@ export class WorkspaceService {
     @Optional() private logger = new Logger('Workspace Service'),
   ) {}
 
-  async getWorkspaces(): Promise<Workspace[]> {
+  async getWorkspaces(): Promise<WorkspaceDocument[]> {
     return await this.workspaceModel.find().exec();
+  }
+
+  async getUsersWorkspaces(userId: string): Promise<WorkspaceDocument[]> {
+    return await this.workspaceModel.find({ userId });
   }
 
   async createWorkspace(
