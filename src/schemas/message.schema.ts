@@ -1,9 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Date, HydratedDocument, Types } from 'mongoose';
+import { Date, Document, Types } from 'mongoose';
 
 import { Workspace } from './workspace.schema';
-
-export type MessageDocument = HydratedDocument<Message>;
 
 @Schema()
 export class Message {
@@ -19,5 +17,7 @@ export class Message {
   @Prop({ required: true })
   content: string;
 }
+
+export type MessageDocument = Message & Document;
 
 export const MessageSchema = SchemaFactory.createForClass(Message);

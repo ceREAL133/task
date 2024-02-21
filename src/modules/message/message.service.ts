@@ -9,7 +9,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { Message } from '../../schemas/message.schema';
+import { Message, MessageDocument } from '../../schemas/message.schema';
 import { CreateMessageDto } from '../../dto/create-message.dto';
 import { RequestWithUser } from '../../guards/auth.guard';
 import { WorkspaceService } from '../workspace/workspace.service';
@@ -25,6 +25,48 @@ export class MessageService {
 
   async getMessages(): Promise<Message[]> {
     return await this.messageModel.find().exec();
+  }
+
+  async getUsersMessages(
+    userId: string,
+    searchText: string,
+    startDate: Date,
+    endDate: Date,
+    minLikes: number,
+  ): Promise<MessageDocument[]> {
+    try {
+      const usersWorkspaces =
+        await this.workspaceService.getUsersWorkspaces(userId);
+      const usersWorkspacesIds = usersWorkspaces.map((workspace) =>
+        workspace._id.toString(),
+      );
+
+      this.logger.log(
+        `Trying to find all messages by this params: searchText: ${searchText}, startDate: ${startDate}, endDate: ${endDate}, minLikes: ${minLikes} `,
+      );
+
+      const query: Record<string, any> = {
+        workspaceId: { $in: usersWorkspacesIds },
+      };
+
+      if (searchText) {
+        query.content = { $regex: new RegExp(searchText, 'i') };
+      }
+
+      if (startDate && endDate) {
+        query.date = { $gte: startDate, $lte: endDate };
+      }
+
+      if (minLikes) {
+        query.likes = { $gte: minLikes };
+      }
+
+      return await this.messageModel.find(query);
+    } catch (error) {
+      this.logger.error(error);
+
+      throw new BadRequestException(error.message);
+    }
   }
 
   async createMessage(
@@ -74,6 +116,7 @@ export class MessageService {
       const changedMessage = await this.messageModel.findOneAndUpdate(
         { _id: messageId, workspaceId: { $in: usersWorkspacesIds } },
         { ...dto },
+        { new: true },
       );
 
       if (!changedMessage) {

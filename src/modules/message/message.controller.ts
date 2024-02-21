@@ -8,9 +8,10 @@ import {
   Param,
   Patch,
   Delete,
+  Query,
 } from '@nestjs/common';
 
-import { Message } from '../../schemas/message.schema';
+import { Message, MessageDocument } from '../../schemas/message.schema';
 import { MessageService } from './message.service';
 import { AuthGuard, RequestWithUser } from '../../guards/auth.guard';
 import { CreateMessageDto } from '../../dto/create-message.dto';
@@ -22,8 +23,20 @@ export class MessageController {
 
   @UseGuards(AuthGuard)
   @Get('/')
-  async getMessages(): Promise<Message[]> {
-    return await this.messageService.getMessages();
+  async getUsersMessages(
+    @Req() req: RequestWithUser,
+    @Query('searchText') searchText: string,
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+    @Query('minLikes') minLikes: number,
+  ): Promise<MessageDocument[]> {
+    return await this.messageService.getUsersMessages(
+      req.user._id,
+      searchText,
+      startDate ? new Date(startDate) : undefined,
+      endDate ? new Date(endDate) : undefined,
+      minLikes,
+    );
   }
 
   @UseGuards(AuthGuard)
@@ -35,7 +48,6 @@ export class MessageController {
     return await this.messageService.createMessage(dto, req);
   }
 
-  //TODO: check if user is an owner of workspace, this message belongs to
   @UseGuards(AuthGuard)
   @Patch('/edit/:id')
   async editMessage(
