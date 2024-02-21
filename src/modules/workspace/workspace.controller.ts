@@ -21,8 +21,8 @@ export class WorkspaceController {
 
   @UseGuards(AuthGuard)
   @Get('/')
-  async getWorkspaces(): Promise<Workspace[]> {
-    return await this.workspaceService.getWorkspaces();
+  async getWorkspaces(@Req() req): Promise<Workspace[]> {
+    return await this.workspaceService.getWorkspaces(req.user._id);
   }
 
   @UseGuards(AuthGuard)

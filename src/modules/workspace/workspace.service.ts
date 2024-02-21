@@ -19,8 +19,48 @@ export class WorkspaceService {
     @Optional() private logger = new Logger('Workspace Service'),
   ) {}
 
-  async getWorkspaces(): Promise<WorkspaceDocument[]> {
-    return await this.workspaceModel.find().exec();
+  async getWorkspaces(userId: string): Promise<WorkspaceDocument[]> {
+    try {
+      return this.workspaceModel.aggregate([
+        {
+          $match: {
+            userId,
+          },
+        },
+        {
+          $lookup: {
+            from: 'messages',
+            let: { workspaceIdString: { $toString: '$_id' } },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $eq: ['$workspaceId', '$$workspaceIdString'],
+                  },
+                },
+              },
+            ],
+            as: 'messages',
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            messages: {
+              _id: 1,
+              date: 1,
+              likes: 1,
+              content: 1,
+            },
+          },
+        },
+      ]);
+    } catch (error) {
+      this.logger.error(error);
+
+      throw new BadRequestException(error.message);
+    }
   }
 
   async getUsersWorkspaces(userId: string): Promise<WorkspaceDocument[]> {
